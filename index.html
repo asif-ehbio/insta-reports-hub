@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EHB | Insta Reports Vault v2.1</title>
+    <title>EHB | Insta Reports Vault v2.2</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --accent: #00ffcc; --insta-blue: #3858f0; --grey-text: #737373; --line-color: #dbdbdb; }
-        body, html { margin: 0; padding: 0; background: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; height: 100%; width: 100%; overflow: hidden; }
+        body, html { margin: 0; padding: 0; background: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; height: 100%; width: 100%; overflow: hidden; }
         
         /* 🔒 CEO Login Overlay */
         #login-box { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .login-input { padding: 15px; background: #111; border: 2px solid #333; color: #fff; border-radius: 10px; margin-bottom: 15px; text-align: center; width: 75%; max-width: 300px; outline: none; }
         .login-btn { padding: 12px 40px; background: var(--accent); border: none; border-radius: 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; color: #000; }
 
+        /* 📸 MAIN UI - Matching 54609.png */
         #main-ui { display: block; width: 100%; background: #fff; min-height: 100vh; visibility: hidden; }
-        #capture-area { background: #fff; width: 100%; flex-grow: 1; position: relative; display: flex; flex-direction: column; }
+        #capture-area { background: #fff; width: 100%; height: 100vh; position: relative; display: flex; flex-direction: column; }
         .editable { outline: none; border-bottom: 1px dashed transparent; }
 
         /* 🔋 Status Bar */
@@ -24,40 +25,44 @@
         .sb-left { display: flex; align-items: center; gap: 8px; font-size: 16px; }
         .sb-right { display: flex; align-items: center; gap: 4px; }
         .bat-pill { background: #e5e5ea; border-radius: 12px; padding: 2px 5px; display: flex; align-items: center; gap: 2px; position: relative; min-width: 40px; height: 18px; overflow: hidden; }
-        .bat-fill { position: absolute; left: 0; top: 0; height: 100%; background: #34c759; transition: width 0.3s ease; z-index: 1; }
+        .bat-fill { position: absolute; left: 0; top: 0; height: 100%; background: #34c759; }
         .bat-text { position: relative; z-index: 2; color: #fff; font-size: 11px; font-weight: 800; }
 
-        /* 🛠️ Header */
-        .top-nav { display: flex; align-items: center; padding: 12px 18px; gap: 28px; border-bottom: 1px solid #efefef; }
+        /* 🛠️ Top Nav */
+        .top-nav { display: flex; align-items: center; padding: 12px 18px; gap: 28px; }
+        .top-nav i { font-size: 18px; color: #000; }
         .top-nav b { font-size: 21.5px; font-weight: 700; flex-grow: 1; }
 
         /* 📸 Exact Content Layout */
-        .report-section { padding: 22px 18px; display: flex; gap: 15px; position: relative; flex-grow: 1; }
+        .report-section { padding: 22px 18px; display: flex; gap: 15px; position: relative; }
+        
+        /* The Vertical Grey Line matching original */
         .v-line { position: absolute; left: 34.5px; top: 60px; height: 110px; width: 1.5px; background: var(--line-color); z-index: 1; }
         
-        .glyph-box { width: 33px; height: 33px; border: 1.5px solid var(--line-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 2; flex-shrink: 0; margin-top: 5px; cursor: pointer; overflow: hidden; }
-        .glyph-box img { width: 100%; height: 100%; object-fit: contain; }
+        /* 🖼️ Black Glyph Box matching image 2 */
+        .glyph-box { width: 32px; height: 32px; border: 1.5px solid var(--line-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 2; flex-shrink: 0; margin-top: 5px; cursor: pointer; }
+        .glyph-box i { font-size: 19px; color: #000; }
         
         .text-content { flex-grow: 1; display: flex; flex-direction: column; z-index: 2; padding-top: 3px; }
         .date { font-size: 13.5px; color: var(--grey-text); margin-bottom: 4.5px; }
-        .bold-msg { font-size: 16.5px; font-weight: 600; color: #000; line-height: 1.4; margin-bottom: 13px; }
+        .bold-msg { font-size: 16px; font-weight: 600; color: #000; line-height: 1.4; margin-bottom: 13px; }
         .grey-msg { font-size: 14.5px; color: var(--grey-text); line-height: 1.4; margin-bottom: 30px; }
         
-        .prev-msg-row { display: flex; align-items: center; gap: 14px; color: var(--insta-blue); font-size: 15.5px; font-weight: 600; margin-top: 5px; }
+        .prev-msg-row { display: flex; align-items: center; gap: 14px; color: var(--insta-blue); font-size: 15px; font-weight: 600; margin-top: 5px; }
         .grey-dot { width: 16px; height: 16px; background: var(--line-color); border-radius: 50%; }
 
         /* 🔘 Bottom Button */
-        .button-area { padding: 15px 18px 35px 18px; background: #fff; margin-top: auto; }
-        .blue-btn { width: 100%; background: var(--insta-blue); color: #fff; border: none; border-radius: 12px; padding: 15.5px; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; }
+        .button-area { padding: 15px 18px 45px 18px; margin-top: auto; border-top: 0.5px solid #efefef; }
+        .blue-btn { width: 100%; background: var(--insta-blue); color: #fff; border: none; border-radius: 11px; padding: 14.5px; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; }
 
         .footer-action { padding: 20px; background: #000; width: 100%; box-sizing: border-box; }
-        .save-btn { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 35px; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; }
+        .save-btn { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 35px; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; color: #000; }
     </style>
 </head>
 <body>
 
     <div id="login-box">
-        <h2 style="color:var(--accent); margin-bottom:20px; font-family:monospace;">CEO REPORTS HUB</h2>
+        <h2 style="color:var(--accent); margin-bottom:20px; font-family:monospace;">CEO REPORTS VAULT</h2>
         <input type="password" id="pass" class="login-input" placeholder="Enter Password" onkeypress="if(event.key === 'Enter') unlock()">
         <button onclick="unlock()" class="login-btn">Unlock Hub</button>
     </div>
@@ -66,15 +71,15 @@
         <div id="capture-area">
             <div class="status-bar">
                 <div class="sb-left">
-                    <span class="editable" contenteditable="true">2:19</span>
+                    <span class="editable" contenteditable="true">2:57</span>
                     <i class="fab fa-whatsapp"></i>
                 </div>
                 <div class="sb-right">
                     <i class="fas fa-signal" style="font-size: 12px;"></i>
                     <span style="font-size: 12px; font-weight: 900;">4G</span>
                     <div class="bat-pill">
-                        <div id="fill" class="bat-fill" style="width: 63%;"></div>
-                        <span class="bat-text"><span id="perc" class="editable" contenteditable="true" oninput="updBat()">63</span>%</span>
+                        <div id="fill" class="bat-fill" style="width: 59%;"></div>
+                        <span class="bat-text"><span id="perc" class="editable" contenteditable="true" oninput="updBat()">59</span>%</span>
                     </div>
                 </div>
             </div>
@@ -87,7 +92,7 @@
             <div class="report-section">
                 <div class="v-line"></div>
                 <div class="glyph-box" onclick="document.getElementById('file-input').click()">
-                    <img id="preview" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/132px-Instagram_logo_2016.svg.png">
+                    <i class="fab fa-instagram"></i>
                     <input type="file" id="file-input" style="display: none;" accept="image/*" onchange="loadImg(event)">
                 </div>
                 <div class="text-content">
@@ -108,7 +113,7 @@
         </div>
 
         <div class="footer-action">
-            <button class="save-btn" onclick="save()">📸 SAVE REPORT SCREENSHOT (v2.1)</button>
+            <button class="save-btn" onclick="save()">📸 SAVE SCREENSHOT (v2.2)</button>
         </div>
     </div>
 
@@ -123,7 +128,9 @@
         function loadImg(event) {
             const reader = new FileReader();
             reader.onload = function() {
-                document.getElementById('preview').src = reader.result;
+                // Allows replacing the logo with custom file
+                const glyphBox = document.querySelector('.glyph-box');
+                glyphBox.innerHTML = `<img src="${reader.result}" style="width:100%; height:100%; border-radius:8px; object-fit:contain;">`;
             }
             reader.readAsDataURL(event.target.files[0]);
         }
@@ -139,7 +146,7 @@
             const el = document.getElementById('capture-area');
             html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'Insta-Report-Vault.png';
+                link.download = 'Insta-Report-Final.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
