@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EHB | Insta Reports Vault v2.2</title>
+    <title>EHB | Insta Reports Vault v2.3</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --accent: #00ffcc; --insta-blue: #3858f0; --grey-text: #737373; --line-color: #dbdbdb; }
-        body, html { margin: 0; padding: 0; background: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; height: 100%; width: 100%; overflow: hidden; }
+        body, html { margin: 0; padding: 0; background: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; height: 100%; width: 100%; }
         
         /* 🔒 CEO Login Overlay */
         #login-box { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .login-input { padding: 15px; background: #111; border: 2px solid #333; color: #fff; border-radius: 10px; margin-bottom: 15px; text-align: center; width: 75%; max-width: 300px; outline: none; }
         .login-btn { padding: 12px 40px; background: var(--accent); border: none; border-radius: 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; color: #000; }
 
-        /* 📸 MAIN UI - Matching 54609.png */
-        #main-ui { display: block; width: 100%; background: #fff; min-height: 100vh; visibility: hidden; }
-        #capture-area { background: #fff; width: 100%; height: 100vh; position: relative; display: flex; flex-direction: column; }
+        /* 📸 MAIN UI - Fixed Viewport */
+        #main-ui { display: none; width: 100%; height: 100vh; flex-direction: column; background: #fff; overflow: hidden; }
+        #capture-area { background: #fff; width: 100%; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 100px; }
         .editable { outline: none; border-bottom: 1px dashed transparent; }
 
         /* 🔋 Status Bar */
@@ -28,18 +28,12 @@
         .bat-fill { position: absolute; left: 0; top: 0; height: 100%; background: #34c759; }
         .bat-text { position: relative; z-index: 2; color: #fff; font-size: 11px; font-weight: 800; }
 
-        /* 🛠️ Top Nav */
         .top-nav { display: flex; align-items: center; padding: 12px 18px; gap: 28px; }
-        .top-nav i { font-size: 18px; color: #000; }
         .top-nav b { font-size: 21.5px; font-weight: 700; flex-grow: 1; }
 
-        /* 📸 Exact Content Layout */
+        /* 📸 Content Layout */
         .report-section { padding: 22px 18px; display: flex; gap: 15px; position: relative; }
-        
-        /* The Vertical Grey Line matching original */
         .v-line { position: absolute; left: 34.5px; top: 60px; height: 110px; width: 1.5px; background: var(--line-color); z-index: 1; }
-        
-        /* 🖼️ Black Glyph Box matching image 2 */
         .glyph-box { width: 32px; height: 32px; border: 1.5px solid var(--line-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 2; flex-shrink: 0; margin-top: 5px; cursor: pointer; }
         .glyph-box i { font-size: 19px; color: #000; }
         
@@ -47,15 +41,18 @@
         .date { font-size: 13.5px; color: var(--grey-text); margin-bottom: 4.5px; }
         .bold-msg { font-size: 16px; font-weight: 600; color: #000; line-height: 1.4; margin-bottom: 13px; }
         .grey-msg { font-size: 14.5px; color: var(--grey-text); line-height: 1.4; margin-bottom: 30px; }
-        
         .prev-msg-row { display: flex; align-items: center; gap: 14px; color: var(--insta-blue); font-size: 15px; font-weight: 600; margin-top: 5px; }
         .grey-dot { width: 16px; height: 16px; background: var(--line-color); border-radius: 50%; }
 
-        /* 🔘 Bottom Button */
         .button-area { padding: 15px 18px 45px 18px; margin-top: auto; border-top: 0.5px solid #efefef; }
-        .blue-btn { width: 100%; background: var(--insta-blue); color: #fff; border: none; border-radius: 11px; padding: 14.5px; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; }
+        .blue-btn { width: 100%; background: var(--insta-blue); color: #fff; border: none; border-radius: 11px; padding: 14.5px; font-size: 16px; font-weight: 600; }
 
-        .footer-action { padding: 20px; background: #000; width: 100%; box-sizing: border-box; }
+        /* 🔘 FIXED SCREENSHOT BUTTON */
+        .footer-fixed { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            padding: 20px; background: rgba(0,0,0,0.9); 
+            box-sizing: border-box; z-index: 9999; 
+        }
         .save-btn { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 35px; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; color: #000; }
     </style>
 </head>
@@ -84,10 +81,7 @@
                 </div>
             </div>
 
-            <div class="top-nav">
-                <i class="fas fa-arrow-left"></i>
-                <b class="editable" contenteditable="true">Reports</b>
-            </div>
+            <div class="top-nav"><i class="fas fa-arrow-left"></i> <b class="editable" contenteditable="true">Reports</b></div>
 
             <div class="report-section">
                 <div class="v-line"></div>
@@ -99,11 +93,7 @@
                     <div class="date editable" contenteditable="true">January 14</div>
                     <div class="bold-msg editable" contenteditable="true">We removed choice__full_your_furniture's account from Instagram for not following our Community Standards</div>
                     <div class="grey-msg editable" contenteditable="true">Thanks for taking the time to report this. Reporting helps us keep Instagram a safe and supportive community.</div>
-                    
-                    <div class="prev-msg-row">
-                        <div class="grey-dot"></div>
-                        <span class="editable" contenteditable="true">1 Previous Message</span>
-                    </div>
+                    <div class="prev-msg-row"><div class="grey-dot"></div><span class="editable" contenteditable="true">1 Previous Message</span></div>
                 </div>
             </div>
 
@@ -112,8 +102,8 @@
             </div>
         </div>
 
-        <div class="footer-action">
-            <button class="save-btn" onclick="save()">📸 SAVE SCREENSHOT (v2.2)</button>
+        <div class="footer-fixed">
+            <button class="save-btn" onclick="save()">📸 SAVE SCREENSHOT (V2.3)</button>
         </div>
     </div>
 
@@ -121,14 +111,13 @@
         function unlock() {
             if(document.getElementById('pass').value === "asif2008") {
                 document.getElementById('login-box').style.display = 'none';
-                document.getElementById('main-ui').style.visibility = 'visible';
+                document.getElementById('main-ui').style.display = 'flex';
             } else { alert("ACCESS DENIED!"); }
         }
 
         function loadImg(event) {
             const reader = new FileReader();
             reader.onload = function() {
-                // Allows replacing the logo with custom file
                 const glyphBox = document.querySelector('.glyph-box');
                 glyphBox.innerHTML = `<img src="${reader.result}" style="width:100%; height:100%; border-radius:8px; object-fit:contain;">`;
             }
@@ -137,16 +126,14 @@
 
         function updBat() {
             let val = parseInt(document.getElementById('perc').innerText);
-            if(!isNaN(val)) {
-                document.getElementById('fill').style.width = val + '%';
-            }
+            if(!isNaN(val)) { document.getElementById('fill').style.width = val + '%'; }
         }
 
         function save() {
             const el = document.getElementById('capture-area');
             html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'Insta-Report-Final.png';
+                link.download = 'Insta-Report-Fixed.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
