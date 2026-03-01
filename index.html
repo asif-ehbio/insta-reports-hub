@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EHB | Insta Reports Hub v1.5</title>
+    <title>EHB | Insta Private Profile Vault v1.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --accent: #00ffcc; --insta-blue: #3858f0; --grey-text: #737373; --line-color: #dbdbdb; }
+        :root { --accent: #00ffcc; --insta-blue: #0095f6; --grey-text: #737373; --line-color: #efefef; }
         
         /* 🛠️ Safe Layout */
         body, html { margin: 0; padding: 0; background: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; height: 100%; width: 100%; overflow-x: hidden; }
 
-        /* 🔒 CEO Login Overlay - Puranoy fix kora */
+        /* 🔒 CEO Login Overlay */
         #login-box { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; color: #fff; z-index: 10000; 
@@ -21,7 +21,7 @@
         .login-input { padding: 15px; background: #111; border: 2px solid #333; color: #fff; border-radius: 10px; margin-bottom: 15px; text-align: center; width: 75%; max-width: 300px; outline: none; }
         .login-btn { padding: 12px 40px; background: var(--accent); border: none; border-radius: 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; color: #000; }
 
-        /* 📸 UI Layout */
+        /* 📸 MAIN UI - Exact Match with image_0.png */
         #main-ui { display: block; width: 100%; background: #fff; min-height: 100vh; visibility: hidden; }
         #capture-area { background: #fff; width: 100%; display: flex; flex-direction: column; }
         .editable { outline: none; border-bottom: 1px dashed transparent; }
@@ -34,41 +34,56 @@
         .bat-fill { position: absolute; left: 0; top: 0; height: 100%; background: #34c759; z-index: 1; }
         .bat-text { position: relative; z-index: 2; color: #fff; font-size: 11px; font-weight: 800; }
 
-        .top-nav { display: flex; align-items: center; padding: 12px 18px; gap: 28px; border-bottom: 1px solid #efefef; }
-        .top-nav b { font-size: 21.5px; font-weight: 700; }
+        /* 🛠️ Top Nav */
+        .top-nav { display: flex; align-items: center; padding: 12px 18px; gap: 28px; background: #fff; border-bottom: 1px solid var(--line-color); }
+        .top-nav i { font-size: 18px; color: #000; }
+        .top-nav b { font-size: 21.5px; font-weight: 700; flex-grow: 1; letter-spacing: -0.5px; }
 
-        .report-section { padding: 22px 18px; display: flex; gap: 15px; position: relative; }
-        .v-line { position: absolute; left: 34.5px; top: 60px; height: 110px; width: 1.5px; background: var(--line-color); z-index: 1; }
-        .glyph-box { width: 33px; height: 33px; border: 1.5px solid var(--line-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 2; flex-shrink: 0; margin-top: 5px; }
+        /* 📸 Profile Header Section */
+        .profile-header { padding: 15px 18px 8px 18px; display: flex; align-items: center; gap: 25px; }
+        .profile-pic-container { width: 85px; height: 85px; border-radius: 50%; overflow: hidden; background: #f0f2f5; cursor: pointer; flex-shrink: 0; }
+        .profile-pic-container img { width: 100%; height: 100%; object-fit: cover; }
         
-        .text-content { flex-grow: 1; display: flex; flex-direction: column; z-index: 2; padding-top: 3px; }
-        .date { font-size: 13.5px; color: var(--grey-text); margin-bottom: 4.5px; }
-        .bold-msg { font-size: 16px; font-weight: 600; color: #000; line-height: 1.4; margin-bottom: 13px; }
-        .grey-msg { font-size: 14.5px; color: var(--grey-text); line-height: 1.4; margin-bottom: 30px; }
-        
-        .prev-msg-row { display: flex; align-items: center; gap: 14px; color: var(--insta-blue); font-size: 15px; font-weight: 600; margin-top: 5px; }
-        .grey-dot { width: 16px; height: 16px; background: var(--line-color); border-radius: 50%; }
+        .stats-box { flex-grow: 1; display: flex; justify-content: space-between; text-align: center; padding-right: 15px; }
+        .stat { display: flex; flex-direction: column; }
+        .stat b { font-size: 18px; line-height: 1.2; font-weight: 700; }
+        .stat span { font-size: 13.5px; color: #262626; font-weight: 400; }
 
-        .button-area { padding: 15px 18px 30px 18px; }
-        .blue-btn { width: 100%; background: var(--insta-blue); color: #fff; border: none; border-radius: 11px; padding: 14.5px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        /* 🛠️ Bio Section with Fixed Name Alignment */
+        .bio-section { padding: 0 18px 12px 18px; }
+        .display-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; color: #000; }
+        .bio-text { font-size: 14.5px; color: #262626; line-height: 1.3; font-weight: 400; }
 
-        .footer-action { padding: 20px; background: #000; width: 100%; box-sizing: border-box; }
+        /* 🔘 Action Buttons */
+        .action-btns { padding: 0 18px 20px 18px; display: flex; gap: 8px; border-bottom: 1px solid var(--line-color); }
+        .btn-follow { flex-grow: 1; background: var(--insta-blue); color: #fff; border: none; border-radius: 8px; padding: 10px; font-weight: 600; font-size: 14px; text-align: center; }
+        .btn-more { background: #efefef; padding: 10px 15px; border: none; border-radius: 8px; color: #000; font-size: 14px; }
+
+        /* 🔒 Restricted Message (Private Section) */
+        .private-box { padding: 40px 30px; text-align: center; display: flex; flex-direction: column; align-items: center; margin-top: 15px; }
+        .lock-icon { width: 90px; height: 90px; border: 2.5px solid #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 25px; }
+        .lock-icon i { font-size: 45px; color: #000; }
+        .private-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: #000; letter-spacing: -0.5px; }
+        .private-desc { font-size: 14.5px; color: var(--grey-text); line-height: 1.4; font-weight: 400; max-width: 250px; }
+
+        /* Screenshot Button */
+        .footer-action { padding: 20px; background: #000; width: 100%; box-sizing: border-box; flex-shrink: 0; }
         .save-btn { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 35px; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div id="login-box">
-        <h2 style="color:var(--accent); margin-bottom:20px; font-family:monospace;">CEO REPORTS HUB</h2>
+        <h2 style="color:var(--accent); margin-bottom:20px; font-family:monospace;">CEO PROFILE VAULT</h2>
         <input type="password" id="pass" class="login-input" placeholder="Enter Password" onkeypress="if(event.key === 'Enter') unlock()">
-        <button onclick="unlock()" class="login-btn">Unlock Hub</button>
+        <button onclick="unlock()" class="login-btn">Unlock Vault</button>
     </div>
 
     <div id="main-ui">
         <div id="capture-area">
             <div class="status-bar">
                 <div class="sb-left">
-                    <span class="editable" contenteditable="true">01:22</span>
+                    <span class="editable" contenteditable="true">11:26</span>
                     <i class="fab fa-whatsapp"></i>
                 </div>
                 <div class="sb-right">
@@ -83,34 +98,46 @@
 
             <div class="top-nav">
                 <i class="fas fa-arrow-left"></i>
-                <b class="editable" contenteditable="true">Reports</b>
+                <b class="editable" contenteditable="true">ridhwan_restricted</b>
+                <i class="fas fa-ellipsis-v"></i>
             </div>
 
-            <div class="report-section">
-                <div class="v-line"></div>
-                <div class="glyph-box"><i class="fab fa-instagram" style="font-size: 20px;"></i></div>
-                <div class="text-content">
-                    <div class="date editable" contenteditable="true">January 14</div>
-                    <div class="bold-msg editable" contenteditable="true">We removed choice__full_your_furniture's account from Instagram for not following our Community Standards</div>
-                    <div class="grey-msg editable" contenteditable="true">Thanks for taking the time to report this. Reporting helps us keep Instagram a safe and supportive community.</div>
-                    <div class="prev-msg-row">
-                        <div class="grey-dot"></div>
-                        <span class="editable" contenteditable="true">1 Previous Message</span>
-                    </div>
+            <div class="profile-header">
+                <div class="profile-pic-container" onclick="document.getElementById('file-input').click()">
+                    <img id="preview" src="https://via.placeholder.com/150">
+                    <input type="file" id="file-input" style="display: none;" accept="image/*" onchange="loadImg(event)">
+                </div>
+                <div class="stats-box">
+                    <div class="stat"><b class="editable" contenteditable="true">2</b><span>posts</span></div>
+                    <div class="stat"><b class="editable" contenteditable="true">43</b><span>followers</span></div>
+                    <div class="stat"><b class="editable" contenteditable="true">91</b><span>following</span></div>
                 </div>
             </div>
 
-            <div class="button-area">
-                <button class="blue-btn editable" contenteditable="true">See options</button>
+            <div class="bio-section">
+                <div class="display-name editable" contenteditable="true">Ridhwan Mahamud</div>
+                <div class="bio-text editable" contenteditable="true">☠️Criminal☠️</div>
+            </div>
+
+            <div class="action-btns">
+                <button class="btn-follow editable" contenteditable="true">Follow</button>
+                <button class="btn-more"><i class="fas fa-chevron-down"></i></button>
+            </div>
+
+            <div class="private-box">
+                <div class="lock-icon"><i class="fas fa-lock"></i></div>
+                <div class="private-title">This account is private</div>
+                <div class="private-desc">Follow this account to see their photos and videos.</div>
             </div>
         </div>
 
         <div class="footer-action">
-            <button class="save-btn" onclick="save()">📸 SAVE REPORT SCREENSHOT (v1.5)</button>
+            <button class="save-btn" onclick="save()">📸 SAVE PROFILE SCREENSHOT (v1.0)</button>
         </div>
     </div>
 
     <script>
+        // 🔐 Login Logic
         function unlock() {
             var inputPass = document.getElementById('pass').value;
             if(inputPass === "asif2008") {
@@ -118,22 +145,32 @@
                 document.getElementById('main-ui').style.visibility = 'visible';
                 console.log("Unlocked successfully!");
             } else { 
-                alert("ACCESS DENIED!"); 
+                alert("ACCESS DENIED! Use CEO Password."); 
             }
+        }
+
+        // 📁 File System for Profile Pic
+        function loadImg(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('preview').src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
         }
 
         function updBat() {
             let val = parseInt(document.getElementById('perc').innerText);
             if(!isNaN(val)) {
                 document.getElementById('fill').style.width = val + '%';
+                document.getElementById('fill').style.background = val < 20 ? '#ff3b30' : '#34c759';
             }
         }
 
         function save() {
             const el = document.getElementById('capture-area');
-            html2canvas(el, { scale: 3, useCORS: true }).then(canvas => {
+            html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'Insta-Report-Fixed.png';
+                link.download = 'Insta-Private-Profile.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
